@@ -29,14 +29,20 @@ requirements:
     - {{posix}}automake         # [not win]
     - {{posix}}autoconf
     - {{posix}}libtool
+  run:
+    - posix            # [win]
+    - m2w64-gcc-libs   # [win]
 
 test:
   commands:
-    - test -e $PREFIX/lib/libffi.so  # [linux]
-    - test -e $PREFIX/lib/libffi.a  # [unix]
+    - test -e $PREFIX/lib/libffi.so     # [linux]
     - test -e $PREFIX/lib/libffi.dylib  # [osx]
-    - test -e $PREFIX/include/ffi.h
-    - test -e $PREFIX/include/ffitarget.h
+    - test -e $PREFIX/lib/libffi.a      # [unix]
+    - test -e $PREFIX/include/ffi.h     # [unix]
+    - test -e $PREFIX/include/ffitarget.h  # [unix]
+    - if not exist %PREFIX%\\lib\\libffi.a exit 1  # [win]
+    - if not exist %PREFIX%\\include\\ffi.h exit 1  # [win]
+    - if not exist %PREFIX%\\include\\ffitarget.h exit 1  # [win]
 
 about:
   home: https://sourceware.org/libffi/
