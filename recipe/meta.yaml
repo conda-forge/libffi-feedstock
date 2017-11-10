@@ -1,5 +1,7 @@
 {% set name = "libffi" %}
 {% set version = "3.2.1" %}
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
 
 package:
   name: {{ name|lower }}
@@ -11,16 +13,22 @@ source:
   sha1: 280c265b789e041c02e5c97815793dfc283fb1e6
   patches:
     - configure_includedir_option.patch
+    - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
+    - 0003-Win64-remove-two-SHORT-annotations.patch                    # [win]
+    - 0004-Update-to-libtool-2.4.6.34.patch                            # [win]
+#    - 9999-Hack-verbose-libtool.patch                                 # [win]
 
 build:
   number: 3
-  skip: True  # [win]
 
 requirements:
   build:
-    - autoconf
-    - automake
-    - libtool
+    - posix                     # [win]
+    - {{posix}}automake-wrapper # [win]
+    - {{native}}toolchain       # [win]
+    - {{posix}}automake         # [not win]
+    - {{posix}}autoconf
+    - {{posix}}libtool
 
 test:
   commands:
