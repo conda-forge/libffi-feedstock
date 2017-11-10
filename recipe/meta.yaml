@@ -23,15 +23,15 @@ build:
 
 requirements:
   build:
-    - posix                     # [win]
-    - {{posix}}automake-wrapper # [win]
-    - {{native}}toolchain       # [win]
-    - {{posix}}automake         # [not win]
+    - posix                      # [win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}automake          # [not win]
     - {{posix}}autoconf
     - {{posix}}libtool
   run:
-    - posix            # [win]
-    - m2w64-gcc-libs   # [win]
+    - posix           # [win]
+    - m2w64-gcc-libs  # [win]
 
 test:
   commands:
