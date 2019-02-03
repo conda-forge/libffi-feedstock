@@ -9,7 +9,7 @@ package:
 
 source:
   url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
-  sha256: 403d67aabf1c05157855ea2b1d9950263fb6316536c8c333f5b9ab1eb2f20ecf 
+  sha256: 403d67aabf1c05157855ea2b1d9950263fb6316536c8c333f5b9ab1eb2f20ecf
   patches:
     - configure_includedir_option.patch
     # Windows-specific:
