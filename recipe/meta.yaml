@@ -1,4 +1,4 @@
-{% set version = "3.3" %}
+{% set version = "3.3-rc0" %}
 {% set am_version = "1.15" %} # keep synchronized with build.sh
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -8,7 +8,7 @@ package:
   version: {{ version }}
 
 source:
-  url: https://github.com/libffi/libffi/archive/v{{ version }}-rc0.tar.gz
+  url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
   sha256: 403d67aabf1c05157855ea2b1d9950263fb6316536c8c333f5b9ab1eb2f20ecf
   patches:
     - configure_includedir_option.patch
