@@ -41,8 +41,8 @@ rm -f "$DONE_CANARY"
 
 # Set up the docker image that we are going to use.
 docker pull $DOCKER_IMAGE
-# Enable running in interactive mode attached to a tty
-DOCKER_RUN_ARGS=" -it "
+# Not all providers run with a real tty.  Disable using one
+DOCKER_RUN_ARGS=" "
 
 export UPLOAD_PACKAGES="${UPLOAD_PACKAGES:-True}"
 docker run ${DOCKER_RUN_ARGS} \

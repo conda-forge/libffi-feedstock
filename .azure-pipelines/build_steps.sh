@@ -24,8 +24,7 @@ conda install --yes --quiet conda-forge-ci-setup=2 conda-build -c conda-forge
 # set up the condarc
 setup_conda_rc "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"
 
-source run_conda_forge_build_setup
-
+run_conda_forge_build_setup
 # If we have yum requirements build a new specialized image that we will use to run our build in that includes
 # those dependencies.
 if [ -f ${RECIPE_ROOT}/yum_requirements.txt ]; then
