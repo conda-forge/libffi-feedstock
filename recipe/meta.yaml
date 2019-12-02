@@ -11,7 +11,7 @@ source:
   url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
   sha256: 3f2f86094f5cf4c36cfe850d2fe029d01f5c2c2296619407c8ba0d8207da9a6b
   patches:  # [win]
-    - configure_includedir_option.patch  # [win]
+    #- configure_includedir_option.patch  # [win]
     # Windows-specific:
     - 0001-x86-MSVC-does-not-support-Complex-type.patch                # [win]
     - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
