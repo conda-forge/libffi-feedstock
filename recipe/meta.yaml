@@ -10,7 +10,7 @@ package:
 source:
   url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
   sha256: 3f2f86094f5cf4c36cfe850d2fe029d01f5c2c2296619407c8ba0d8207da9a6b
-  patches:
+  #patches:
     #- configure_includedir_option.patch
     # Windows-specific:
     #- 0001-x86-MSVC-does-not-support-Complex-type.patch                # [win]
