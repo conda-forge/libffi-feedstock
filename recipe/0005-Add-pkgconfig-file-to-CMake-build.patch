@@ -1,0 +1,48 @@
+From 66efa935a3d9e6ced802924382e90cfca851109f Mon Sep 17 00:00:00 2001
+From: Ryan Volz <rvolz@mit.edu>
+Date: Tue, 10 Mar 2020 18:47:25 -0400
+Subject: [PATCH 5/5] Add pkgconfig file to CMake build.
+
+---
+ CMakeLists.txt          | 4 ++++
+ configure_options.cmake | 8 ++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 26cc2fd..3cb5f14 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -54,3 +54,7 @@ install(FILES
+     ${CMAKE_BINARY_DIR}/include/ffi.h
+     ${CMAKE_BINARY_DIR}/include/ffitarget.h
+     DESTINATION include)
++
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libffi.pc
++    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
++)
+diff --git a/configure_options.cmake b/configure_options.cmake
+index ceb6539..eb8497f 100644
+--- a/configure_options.cmake
++++ b/configure_options.cmake
+@@ -5,6 +5,7 @@ include(CheckIncludeFile)
+ include(CheckIncludeFiles)
+ include(CheckSymbolExists)
+ include(CheckTypeSize)
++include(GNUInstallDirs)
+
+ # options in AC counterpart can be overriden from command-line
+ # e.g.:  cmake .. -DFFI_MMAP_EXEC_EMUTRAMP_PAX=1 -DVERSION=X.Y
+@@ -338,3 +339,10 @@ foreach(ASM_PATH IN LISTS WIN_ASSEMBLY_LIST)
+         list(APPEND OBJECTS_LIST ${CMAKE_CURRENT_BINARY_DIR}/${ASM_FILENAME}.obj)
+     endif()
+ endforeach()
++
++set(prefix ${CMAKE_INSTALL_PREFIX})
++set(exec_prefix \${prefix})
++set(libdir \${exec_prefix}/lib)
++set(toolexeclibdir \${libdir})
++set(includedir \${prefix}/include)
++configure_file(libffi.pc.in libffi.pc @ONLY)
+--
+2.20.1
+

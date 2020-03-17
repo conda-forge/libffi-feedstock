@@ -1,7 +1,4 @@
-{% set version = "3.2.1" %}
-{% set am_version = "1.15" %} # keep synchronized with build.sh
-{% set posix = 'm2-' if win else '' %}
-{% set native = 'm2w64-' if win else '' %}
+{% set version = "3.3" %}
 
 package:
   name: libffi
@@ -9,37 +6,25 @@ package:
 
 source:
   url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
-  sha256: 96d08dee6f262beea1a18ac9a3801f64018dc4521895e9198d029d6850febe23
+  sha256: 3f2f86094f5cf4c36cfe850d2fe029d01f5c2c2296619407c8ba0d8207da9a6b
   patches:
-    - configure_includedir_option.patch
-    # Windows-specific:
-    - 0001-x86-MSVC-does-not-support-Complex-type.patch                # [win]
-    - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
-    - 0003-Win64-Remove-two-SHORT-annotations.patch                    # [win]
-    - 0004-Remove-C99-constructs.patch                                 # [win]
-    - windows-static.patch                                             # [win]
+    - 0001-Add-cmake-configuration-files.patch
+    - 0004-Fix-Win32-and-Win64-MASM-build.patch
+    - 0005-Add-pkgconfig-file-to-CMake-build.patch
+    - 0006-Make-static-library-output-as-libffi.lib-on-Windows.patch
 
 build:
-  number: 1006
+  number: 0
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
-    - {{ pin_subpackage('libffi') }}
+    - {{ pin_subpackage('libffi', max_pin='x.x') }}
 
 requirements:
   build:
-    - posix                              # [win]
-    - make                               # [unix] 
-    - {{posix}}autoconf
-    - {{posix}}automake{{ am_version }}  # [win]
-    - {{posix}}automake                  # [not win]
-    - {{posix}}libtool
-    - {{posix}}patch
-    - {{posix}}texinfo
+    - cmake
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
   host:
-  run:
-    - {{native}}gcc-libs  # [win]
 
 test:
   commands:
@@ -47,6 +32,8 @@ test:
     - test -e $PREFIX/lib/libffi.a                                 # [not win]
     - test -e $PREFIX/include/ffi.h                                # [not win]
     - test -e $PREFIX/include/ffitarget.h                          # [not win]
+    - if not exist %LIBRARY_PREFIX%/bin/ffi.dll exit /b 1          # [win]
+    - if not exist %LIBRARY_PREFIX%/lib/ffi.lib exit /b 1          # [win]
     - if not exist %LIBRARY_PREFIX%/lib/libffi.lib exit /b 1       # [win]
     - if not exist %LIBRARY_PREFIX%/include/ffi.h exit /b 1        # [win]
     - if not exist %LIBRARY_PREFIX%/include/ffitarget.h exit /b 1  # [win]
