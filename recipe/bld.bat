@@ -13,7 +13,7 @@ cmake -G "NMake Makefiles JOM" ^
 if errorlevel 1 exit 1
 
 :: build
-cmake --build . --config Release -- -j%CPU_COUNT%
+cmake --build . --config Release -- -j%CPU_COUNT% %VERBOSE_CM%
 if errorlevel 1 exit 1
 
 :: install
