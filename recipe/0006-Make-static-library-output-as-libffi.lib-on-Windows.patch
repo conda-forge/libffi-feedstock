@@ -1,0 +1,27 @@
+From e05bc962bb0770b33d829d2989a6b83f4dd82163 Mon Sep 17 00:00:00 2001
+From: Ryan Volz <rvolz@mit.edu>
+Date: Wed, 11 Mar 2020 15:08:27 -0400
+Subject: [PATCH 6/6] Make static library output as libffi.lib on Windows.
+
+---
+ CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3cb5f14..1b1b010 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -38,6 +38,10 @@ elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
+ endif()
+ add_library(ffi_shared SHARED $<TARGET_OBJECTS:objlib> ${OBJECTS_LIST})
+ 
++if(WIN32)
++    set(CMAKE_STATIC_LIBRARY_PREFIX "lib")
++endif()
++
+ set_target_properties(ffi_static PROPERTIES OUTPUT_NAME ffi)
+ set_target_properties(ffi_shared PROPERTIES OUTPUT_NAME ffi)
+ 
+-- 
+2.20.1
+
