@@ -1,4 +1,4 @@
-{% set version = "3.3" %}
+{% set version = "3.4.0" %}
 {% set am_version = "1.15" %} # keep synchronized with build.sh
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -9,14 +9,14 @@ package:
 
 source:
   url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
-  sha256: 3f2f86094f5cf4c36cfe850d2fe029d01f5c2c2296619407c8ba0d8207da9a6b
-  patches:  # [win]
+  sha256: f6cf553720c7b7d901123acab8f3383778e51cd4da4cf0d0f88e54282422e58e
+  patches:   # [win]
     # Windows-specific:
     - 0001-x86-MSVC-does-not-support-Complex-type.patch                # [win]
     - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
 
 build:
-  number: 2
+  number: 0
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
