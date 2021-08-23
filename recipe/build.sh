@@ -14,13 +14,21 @@ configure_args=(
 )
 
 if [[ "$target_platform" != win-* ]]; then
-  configure_args+=(--build=$BUILD --host=$HOST)
+  configure_args+=(--build=aarch64-apple-darwin20.0.0 --host=$HOST)
 else
   configure_args+=(--disable-static)
-  export CPPFLAGS="$CPPFLAGS -DFFI_BUILDING_DLL"
+  export CPPFLAGS="${CPPFLAGS} -DFFI_BUILDING_DLL"
+  export CFLAGS="${CFLAGS} -DFFI_BUILDING_DLL"
 fi
 
-autoreconf -vfi
+if [[ "$target_platform" == osx-* ]]; then
+  export CFLAGS="${CFLAGS} -Wno-deprecated-declarations"
+  export CXXFLAGS="${CXXFLAGS} -Wno-deprecated-declarations"
+  export CPP="${CC} -E"
+  export CXXCPP="${CXX} -E"
+else
+ autoreconf -vfi
+fi
 
 if [[ "$target_platform" == linux* ]]; then
   # this changes the install dir from ${PREFIX}/lib64 to ${PREFIX}/lib
