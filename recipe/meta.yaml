@@ -28,7 +28,6 @@ requirements:
     - automake               # [unix]
     - {{ posix }}texinfo
     - {{ compiler('c') }}
-    - {{ stdlib('c') }}
   host:
   run:
 
