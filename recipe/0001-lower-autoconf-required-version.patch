@@ -1,5 +1,5 @@
 diff --git a/configure.ac b/configure.ac
-index b35a999..ad6a46c 100644
+index b35a999..b1ca3b0 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -1,6 +1,6 @@
@@ -10,3 +10,11 @@ index b35a999..ad6a46c 100644
  
  AC_INIT([libffi],[3.4.6],[http://github.com/libffi/libffi/issues])
  AC_CONFIG_HEADERS([fficonfig.h])
+@@ -91,7 +91,6 @@ m4_warn([obsolete],
+   ISO C90 headers unconditionally.])dnl
+ # Autoupdate added the next two lines to ensure that your configure
+ # script's behavior did not change.  They are probably safe to remove.
+-AC_CHECK_INCLUDES_DEFAULT
+ AC_PROG_EGREP
+ 
+ AC_CHECK_FUNCS(memcpy)
