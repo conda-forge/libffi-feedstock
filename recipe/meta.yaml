@@ -19,14 +19,15 @@ build:
 
 requirements:
   build:
-    - autotools_clang_conda              # [win]
-    - make                               # [unix]
-    - autoconf                           # [unix]
-    - libtool                            # [unix]
-    - patch                              # [unix]
-    - automake                           # [unix]
+    - autotools_clang_conda  # [win]
+    - make                   # [unix]
+    - autoconf               # [unix]
+    - libtool                # [unix]
+    - patch                  # [unix]
+    - automake               # [unix]
     - {{ posix }}texinfo
     - {{ compiler('c') }}
+    - {{ stdlib('c') }}
   host:
   run:
 
@@ -35,16 +36,16 @@ test:
     - llvm-tools  # [win]
     - m2-grep     # [win]
   commands:
-    - test -e $PREFIX/lib/libffi${SHLIB_EXT}                       # [not win]
-    - test -e $PREFIX/lib/libffi.a                                 # [not win]
-    - test -e $PREFIX/include/ffi.h                                # [not win]
-    - test -e $PREFIX/include/ffitarget.h                          # [not win]
-    - if not exist %LIBRARY_PREFIX%/bin/ffi-8.dll exit /b 1        # [win]
-    - if not exist %LIBRARY_PREFIX%/lib/libffi.lib exit /b 1       # [win]
-    - if not exist %LIBRARY_PREFIX%/lib/ffi.lib exit /b 1          # [win]
-    - if not exist %LIBRARY_PREFIX%/include/ffi.h exit /b 1        # [win]
-    - if not exist %LIBRARY_PREFIX%/include/ffitarget.h exit /b 1  # [win]
-    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void"        # [win]
+    - test -e $PREFIX/lib/libffi${SHLIB_EXT}                                # [not win]
+    - test -e $PREFIX/lib/libffi.a                                          # [not win]
+    - test -e $PREFIX/include/ffi.h                                         # [not win]
+    - test -e $PREFIX/include/ffitarget.h                                   # [not win]
+    - if not exist %LIBRARY_PREFIX%/bin/ffi-8.dll exit /b 1                 # [win]
+    - if not exist %LIBRARY_PREFIX%/lib/libffi.lib exit /b 1                # [win]
+    - if not exist %LIBRARY_PREFIX%/lib/ffi.lib exit /b 1                   # [win]
+    - if not exist %LIBRARY_PREFIX%/include/ffi.h exit /b 1                 # [win]
+    - if not exist %LIBRARY_PREFIX%/include/ffitarget.h exit /b 1           # [win]
+    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void"  # [win]
 
 about:
   home: https://sourceware.org/libffi/
