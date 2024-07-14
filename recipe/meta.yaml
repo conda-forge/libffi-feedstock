@@ -9,7 +9,7 @@ source:
   url: https://github.com/libffi/libffi/releases/download/v{{ version }}/libffi-{{ version }}.tar.gz
   sha256: b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e
   patches:
-    - 0001-lower-autoconf-required-version.patch
+    - 0001-lower-autoconf-required-version.patch                       # [win]
     - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
 
 build:
