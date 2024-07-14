@@ -1,0 +1,12 @@
+diff --git a/configure.ac b/configure.ac
+index b35a999..ad6a46c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,6 +1,6 @@
+ dnl Process this with autoconf to create configure
+ 
+-AC_PREREQ([2.71])
++AC_PREREQ([2.68])
+ 
+ AC_INIT([libffi],[3.4.6],[http://github.com/libffi/libffi/issues])
+ AC_CONFIG_HEADERS([fficonfig.h])
