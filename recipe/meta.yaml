@@ -17,7 +17,7 @@ source:
     - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
 
 build:
-  number: 5
+  number: 6
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
@@ -31,6 +31,7 @@ requirements:
     - patch                              # [unix]
     - automake                           # [unix]
     - {{ posix }}texinfo
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
   host:
   run:
