@@ -1,4 +1,4 @@
-{% set version = "3.4.6" %}
+{% set version = "3.4.7" %}
 {% set posix = 'm2-' if win else '' %}
 
 package:
