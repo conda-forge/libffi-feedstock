@@ -1,4 +1,4 @@
-{% set version = "3.4.6" %}
+{% set version = "3.4.7" %}
 {% set posix = 'm2-' if win else '' %}
 
 package:
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/libffi/libffi/releases/download/v{{ version }}/libffi-{{ version }}.tar.gz
-  sha256: b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e
+  sha256: 138607dee268bdecf374adf9144c00e839e38541f75f24a1fcf18b78fda48b2d
   patches:
     - 0001-arm64-use-a-dedicated-dylib-for-trampolines-so-it-ca.patch
     - 0002-Add-support-for-ffi_find_closure_for_code_np-on-Appl.patch
