@@ -1,7 +1,7 @@
-From 40683c8cdcb17c7fdd44a67d71e5feb95932ce3a Mon Sep 17 00:00:00 2001
+From e9dd495183b2cb0ae4cf8ca72b682db76d3a57e3 Mon Sep 17 00:00:00 2001
 From: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
 Date: Fri, 29 May 2020 11:22:25 -0700
-Subject: [PATCH 1/2] arm64: use a dedicated dylib for trampolines, so it can
+Subject: [PATCH 1/4] arm64: use a dedicated dylib for trampolines, so it can
  be remapped
 
 It is no longer allowed to simply vm_remap code pages willy-nilly.  Only entire
@@ -9,23 +9,28 @@ signed executable segment of a dylib may be remapped.  Accordingly, we need a
 helper dylib (called libffi-trampolines.dylib) to support our use of vm_remap
 for trampolines.
 
-Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
+Co-authored-by: Isuru Fernando <isuruf@gmail.com>
+
+Note(Isuru): Originally from https://github.com/libffi/libffi/pull/621
+Rebased to 3.4.6 and hopefully the change to the VM_PROT_EXECUTE
+branch is correct. Also fixes a memory leak in ffi_trampoline_table_free
+mentioned in the PR..
 ---
  include/ffi.h.in         |  5 +++
- src/aarch64/ffi.c        | 20 ++++++++++++
- src/aarch64/trampoline.S | 44 ++++++++++++++++++++++++++
- src/closures.c           | 67 ++++++++++++++++++++++++++++++++++------
+ src/aarch64/ffi.c        | 20 +++++++++++
+ src/aarch64/trampoline.S | 44 +++++++++++++++++++++++
+ src/closures.c           | 75 ++++++++++++++++++++++++++++++++++------
  src/x86/ffi64.c          |  6 ++++
- 5 files changed, 133 insertions(+), 9 deletions(-)
+ 5 files changed, 139 insertions(+), 11 deletions(-)
  create mode 100644 src/aarch64/trampoline.S
 
 diff --git a/include/ffi.h.in b/include/ffi.h.in
-index d16f307..72c69d2 100644
+index e5c1dae..d23c531 100644
 --- a/include/ffi.h.in
 +++ b/include/ffi.h.in
-@@ -362,6 +362,11 @@ ffi_prep_closure_loc (ffi_closure*,
+@@ -371,6 +371,11 @@ ffi_prep_closure_loc (ffi_closure*,
  		      void *user_data,
- 		      void*codeloc);
+ 		      void *codeloc);
  
 +#if defined(__x86_64__) || defined(__arm64__)
 +FFI_API ffi_closure *
@@ -36,13 +41,13 @@ index d16f307..72c69d2 100644
  # pragma pack 8
  #endif
 diff --git a/src/aarch64/ffi.c b/src/aarch64/ffi.c
-index 5c85fcd..376e447 100644
+index 8661a35..86fabf4 100644
 --- a/src/aarch64/ffi.c
 +++ b/src/aarch64/ffi.c
-@@ -813,7 +813,11 @@ ffi_prep_closure_loc (ffi_closure *closure,
- #ifdef HAVE_PTRAUTH
+@@ -880,7 +880,11 @@ ffi_prep_closure_loc (ffi_closure *closure,
+ #  ifdef HAVE_PTRAUTH
    codeloc = ptrauth_auth_data(codeloc, ptrauth_key_function_pointer, 0);
- #endif
+ #  endif
 +#ifdef FFI_TRAMPOLINE_WHOLE_DYLIB
 +  void **config = (void **)((uint8_t *)codeloc - 2*PAGE_MAX_SIZE);
 +#else
@@ -50,8 +55,8 @@ index 5c85fcd..376e447 100644
 +#endif
    config[0] = closure;
    config[1] = start;
- #endif
-@@ -864,6 +868,22 @@ out:
+ # endif
+@@ -933,6 +937,22 @@ out:
    return FFI_OK;
  }
  
@@ -125,10 +130,10 @@ index 0000000..f82c388
 +#endif /* FFI_EXEC_TRAMPOLINE_TABLE */
 +#endif /* __arm64__ */
 diff --git a/src/closures.c b/src/closures.c
-index f7bead6..460606f 100644
+index 67a94a8..f5752a4 100644
 --- a/src/closures.c
 +++ b/src/closures.c
-@@ -164,7 +164,13 @@ ffi_tramp_is_present (__attribute__((unused)) void *ptr)
+@@ -170,7 +170,13 @@ ffi_tramp_is_present (__attribute__((unused)) void *ptr)
  #include <stdio.h>
  #include <stdlib.h>
  
@@ -142,7 +147,7 @@ index f7bead6..460606f 100644
  
  typedef struct ffi_trampoline_table ffi_trampoline_table;
  typedef struct ffi_trampoline_table_entry ffi_trampoline_table_entry;
-@@ -192,6 +198,21 @@ struct ffi_trampoline_table_entry
+@@ -198,6 +204,21 @@ struct ffi_trampoline_table_entry
  /* Total number of trampolines that fit in one trampoline table */
  #define FFI_TRAMPOLINE_COUNT (PAGE_MAX_SIZE / FFI_TRAMPOLINE_SIZE)
  
@@ -164,7 +169,7 @@ index f7bead6..460606f 100644
  static pthread_mutex_t ffi_trampoline_lock = PTHREAD_MUTEX_INITIALIZER;
  static ffi_trampoline_table *ffi_trampoline_tables = NULL;
  
-@@ -207,35 +228,63 @@ ffi_trampoline_table_alloc (void)
+@@ -213,46 +234,74 @@ ffi_trampoline_table_alloc (void)
    kern_return_t kt;
    uint16_t i;
  
@@ -225,23 +230,48 @@ index f7bead6..460606f 100644
 +  kt = vm_remap (mach_task_self(), &trampoline_segment, trampoline_segment_size, 0x0,
 +		 VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE, mach_task_self(), trampoline_segment_template,
  		 FALSE, &cur_prot, &max_prot, VM_INHERIT_SHARE);
-   if (kt != KERN_SUCCESS || !(cur_prot & VM_PROT_EXECUTE))
+   if (kt != KERN_SUCCESS)
      {
 -      vm_deallocate (mach_task_self (), config_page, PAGE_MAX_SIZE * 2);
 +      vm_deallocate (mach_task_self (), config_page, FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT * PAGE_MAX_SIZE);
        return NULL;
      }
  
+   if (!(cur_prot & VM_PROT_EXECUTE))
+     {
+       /* If VM_PROT_EXECUTE isn't set on the remapped trampoline page, set it */
+-      kt = vm_protect (mach_task_self (), trampoline_page, PAGE_MAX_SIZE,
++      kt = vm_protect (mach_task_self (), trampoline_segment, trampoline_segment_size,
+          FALSE, cur_prot | VM_PROT_EXECUTE);
+       if (kt != KERN_SUCCESS)
+         {
+-          vm_deallocate (mach_task_self (), config_page, PAGE_MAX_SIZE * 2);
++          vm_deallocate (mach_task_self (), config_page, FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT * PAGE_MAX_SIZE);
+           return NULL;
+         }
+     }
++  
 +  trampoline_page = trampoline_segment + FFI_TRAMPOLINE_PAGE_SEGMENT_OFFSET;
-+
+ 
    /* We have valid trampoline and config pages */
    table = calloc (1, sizeof (ffi_trampoline_table));
-   table->free_count = FFI_TRAMPOLINE_COUNT;
+@@ -292,7 +341,11 @@ ffi_trampoline_table_free (ffi_trampoline_table *table)
+     table->next->prev = table->prev;
+ 
+   /* Deallocate pages */
++#ifdef FFI_TRAMPOLINE_WHOLE_DYLIB
++  vm_deallocate (mach_task_self (), table->config_page, FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT * PAGE_MAX_SIZE);
++#else
+   vm_deallocate (mach_task_self (), table->config_page, PAGE_MAX_SIZE * 2);
++#endif
+ 
+   /* Deallocate free list */
+   free (table->free_list_pool);
 diff --git a/src/x86/ffi64.c b/src/x86/ffi64.c
-index 438b374..8b4572f 100644
+index 6a8e37f..9fd7586 100644
 --- a/src/x86/ffi64.c
 +++ b/src/x86/ffi64.c
-@@ -788,6 +788,12 @@ out:
+@@ -809,6 +809,12 @@ out:
    return FFI_OK;
  }
  
@@ -255,5 +285,5 @@ index 438b374..8b4572f 100644
  ffi_closure_unix64_inner(ffi_cif *cif,
  			 void (*fun)(ffi_cif*, void*, void**, void*),
 -- 
-2.30.2
+2.45.2
 

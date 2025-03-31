@@ -1,7 +1,7 @@
-From fbf38ba081aee56f12999290677c8cb5d2ad2da1 Mon Sep 17 00:00:00 2001
+From 6edf66fe241cb927233c86083dcf91c5167b4483 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Mon, 6 Sep 2021 07:37:45 -0700
-Subject: [PATCH 2/2] Add support for ffi_find_closure_for_code_np on Apple
+Subject: [PATCH 2/4] Add support for ffi_find_closure_for_code_np on Apple
 
 Apple name in libffi is slightly different.
 
@@ -13,10 +13,10 @@ Co-authored-by: Kai Tietz <ktietz@anaconda.com>
  3 files changed, 11 insertions(+)
 
 diff --git a/include/ffi.h.in b/include/ffi.h.in
-index 72c69d2..ca524bc 100644
+index d23c531..6bcffe8 100644
 --- a/include/ffi.h.in
 +++ b/include/ffi.h.in
-@@ -365,6 +365,9 @@ ffi_prep_closure_loc (ffi_closure*,
+@@ -374,6 +374,9 @@ ffi_prep_closure_loc (ffi_closure*,
  #if defined(__x86_64__) || defined(__arm64__)
  FFI_API ffi_closure *
  ffi_find_closure_for_code(void *code);
@@ -27,10 +27,10 @@ index 72c69d2..ca524bc 100644
  
  #ifdef __sgi
 diff --git a/src/aarch64/ffi.c b/src/aarch64/ffi.c
-index 376e447..a13b8e3 100644
+index 86fabf4..44ebacf 100644
 --- a/src/aarch64/ffi.c
 +++ b/src/aarch64/ffi.c
-@@ -883,6 +883,10 @@ ffi_find_closure_for_code(void *codeloc)
+@@ -952,6 +952,10 @@ ffi_find_closure_for_code(void *codeloc)
  #endif
  }
  
@@ -42,10 +42,10 @@ index 376e447..a13b8e3 100644
  #ifdef FFI_GO_CLOSURES
  extern void ffi_go_closure_SYSV (void) FFI_HIDDEN;
 diff --git a/src/x86/ffi64.c b/src/x86/ffi64.c
-index 8b4572f..857535e 100644
+index 9fd7586..f2af6ac 100644
 --- a/src/x86/ffi64.c
 +++ b/src/x86/ffi64.c
-@@ -794,6 +794,10 @@ ffi_find_closure_for_code(void *code)
+@@ -815,6 +815,10 @@ ffi_find_closure_for_code(void *code)
      return (ffi_closure *) code;
  }
  
@@ -57,5 +57,5 @@ index 8b4572f..857535e 100644
  ffi_closure_unix64_inner(ffi_cif *cif,
  			 void (*fun)(ffi_cif*, void*, void**, void*),
 -- 
-2.30.2
+2.45.2
 
