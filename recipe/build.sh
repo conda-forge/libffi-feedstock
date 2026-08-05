@@ -53,7 +53,9 @@ if [[ "$target_platform" == win-* ]]; then
 fi
 
 make -j${CPU_COUNT} ${VERBOSE_AT}
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR:-}" != "" ]]; then
 make check
+fi
 make install
 
 # This overlaps with libgcc-ng:
