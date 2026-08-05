@@ -16,7 +16,7 @@ source:
     - 0004-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
 
 build:
-  number: 0
+  number: 1
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', max_pin="x.x") }}
