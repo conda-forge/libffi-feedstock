@@ -49,14 +49,19 @@ tests:
       include:
         - ffi.h
         - ffitarget.h
-      lib:
-        - ffi
       files:
         exists:
+          - if: linux
+            then: lib/libffi.so*
+          - if: osx
+            then: lib/libffi*.dylib
           - if: not win
             then: lib/libffi.a
           - if: win
-            then: Library/lib/libffi.lib
+            then:
+              - Library/bin/ffi-8.dll
+              - Library/lib/ffi.lib
+              - Library/lib/libffi.lib
   - if: win
     then:
       requirements:
