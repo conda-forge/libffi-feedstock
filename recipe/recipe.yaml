@@ -1,0 +1,86 @@
+schema_version: 1
+
+context:
+  version: "3.7.0"
+
+package:
+  name: libffi
+  version: ${{ version }}
+
+source:
+  url: https://github.com/libffi/libffi/releases/download/v${{ version }}/libffi-${{ version }}.tar.gz
+  sha256: 2255c5a638dfb51bf67c20a12a7bb70d17feb1e9eababac05f5573146f586436
+  patches:
+    - 0001-arm64-use-a-dedicated-dylib-for-trampolines-so-it-ca.patch
+    - 0002-Add-support-for-ffi_find_closure_for_code_np-on-Appl.patch
+    - 0003-define-extend_hfa_type-with-inline-assembly-for-clan.patch
+    # Windows-specific:
+    - if: win
+      then: 0004-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch
+
+build:
+  number: 1
+
+requirements:
+  build:
+    - if: unix
+      then:
+        - make
+        - autoconf
+        - libtool
+        - patch
+        - automake <1.17
+        - texinfo
+      else:
+        - autotools_clang_conda
+        - m2-texinfo
+    - gnuconfig
+    - ${{ compiler('c') }}
+    - ${{ stdlib('c') }}
+  run_exports:
+    - ${{ pin_subpackage('libffi', upper_bound="x.x") }}
+
+tests:
+  - package_contents:
+      include:
+        - ffi.h
+        - ffitarget.h
+      files:
+        exists:
+          - if: linux
+            then: lib/libffi.so*
+          - if: osx
+            then: lib/libffi*.dylib
+          - if: not win
+            then: lib/libffi.a
+          - if: win
+            then:
+              - Library/bin/ffi-8.dll
+              - Library/lib/ffi.lib
+              - Library/lib/libffi.lib
+  - if: win
+    then:
+      requirements:
+        run:
+          - llvm-tools
+          - m2-grep
+      script:
+        - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void"
+
+about:
+  license: MIT
+  license_file: LICENSE
+  summary: A Portable Foreign Function Interface Library.
+  description: |
+    The libffi library provides a portable, high level programming interface
+    to various calling conventions. This allows a programmer to call any
+    function specified by a call interface description at run-time.
+  homepage: https://sourceware.org/libffi/
+  repository: https://github.com/libffi/libffi
+  documentation: https://sourceware.org/libffi/
+
+extra:
+  recipe-maintainers:
+    - stefan-balke
+    - scopatz
+    - isuruf
