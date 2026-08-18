@@ -88,6 +88,11 @@ call :end_group
 
 :: Build the recipe
 echo Building recipe
+
+echo foo > foo.txt
+set /p foo=<foo.txt
+set "bar=%foo%"
+
 set "_OLD_CONDA_SUBDIR=%CONDA_SUBDIR%"
 set "CONDA_SUBDIR=%BUILD_PLATFORM%"
 echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
