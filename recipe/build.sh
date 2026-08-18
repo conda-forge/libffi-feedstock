@@ -3,6 +3,8 @@
 set -e -x
 shopt -s extglob
 
+echo "target platform: ${target_platform} ${TARGET_PLATFORM}"
+
 for file in $(find ${SRC_DIR} -type f -name "config.sub"); do
   cp $BUILD_PREFIX/share/gnuconfig/config.sub ${file}
 done
