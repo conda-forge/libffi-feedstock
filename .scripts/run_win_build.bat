@@ -31,7 +31,6 @@ powershell -ExecutionPolicy Bypass -Command "(New-Object Net.WebClient).Download
 if !errorlevel! neq 0 exit /b !errorlevel!
 
 echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
-set "TARGET_PLATFORM="
 echo Creating environment
 call "%MICROMAMBA_EXE%" create --yes --root-prefix "%MAMBA_ROOT_PREFIX%" --prefix "%MINIFORGE_HOME%" ^
     --channel conda-forge ^
@@ -91,6 +90,8 @@ call :end_group
 echo Building recipe
 set "_OLD_CONDA_SUBDIR=%CONDA_SUBDIR%"
 set "CONDA_SUBDIR=%BUILD_PLATFORM%"
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
+set "TARGET_PLATFORM="
 echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 conda-build.exe "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
 if !errorlevel! neq 0 exit /b !errorlevel!
