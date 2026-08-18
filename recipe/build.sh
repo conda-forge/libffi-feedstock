@@ -7,6 +7,7 @@ echo "target_platform: ${target_platform}"
 echo "TARGET_PLATFORM: ${TARGET_PLATFORM}"
 echo "foo: ${foo}, FOO: ${FOO}"
 echo "bar: ${bar}, BAR: ${BAR}"
+echo "baz: ${baz}, BAZ: ${BAZ}"
 
 for file in $(find ${SRC_DIR} -type f -name "config.sub"); do
   cp $BUILD_PREFIX/share/gnuconfig/config.sub ${file}
