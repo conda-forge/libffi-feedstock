@@ -12,6 +12,8 @@
 
 setlocal enableextensions enabledelayedexpansion
 
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
+
 FOR %%A IN ("%~dp0.") DO SET "REPO_ROOT=%%~dpA"
 if "%MINIFORGE_HOME%"=="" set "MINIFORGE_HOME=%USERPROFILE%\Miniforge3"
 :: Remove trailing backslash, if present
@@ -28,6 +30,7 @@ if not exist "%MICROMAMBA_TMPDIR%" mkdir "%MICROMAMBA_TMPDIR%"
 powershell -ExecutionPolicy Bypass -Command "(New-Object Net.WebClient).DownloadFile('%MICROMAMBA_URL%', '%MICROMAMBA_EXE%')"
 if !errorlevel! neq 0 exit /b !errorlevel!
 
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 echo Creating environment
 call "%MICROMAMBA_EXE%" create --yes --root-prefix "%MAMBA_ROOT_PREFIX%" --prefix "%MINIFORGE_HOME%" ^
     --channel conda-forge ^
@@ -38,11 +41,15 @@ del /S /Q "%MAMBA_ROOT_PREFIX%" >nul
 del /S /Q "%MICROMAMBA_TMPDIR%" >nul
 call :end_group
 
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 call :start_group "Configuring conda"
 
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 :: Activate the base conda environment
 echo Activating environment
 call "%MINIFORGE_HOME%\Scripts\activate.bat"
+
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 :: Configure the solver
 set "CONDA_SOLVER=libmamba"
 if !errorlevel! neq 0 exit /b !errorlevel!
@@ -50,10 +57,15 @@ set "CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1"
 
 :: Set basic configuration
 echo Setting up configuration
+
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 setup_conda_rc .\ ".\recipe" .\.ci_support\%CONFIG%.yaml
 if !errorlevel! neq 0 exit /b !errorlevel!
 echo Running build setup
+
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 CALL run_conda_forge_build_setup
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 
 
 if !errorlevel! neq 0 exit /b !errorlevel!
@@ -78,6 +90,7 @@ call :end_group
 echo Building recipe
 set "_OLD_CONDA_SUBDIR=%CONDA_SUBDIR%"
 set "CONDA_SUBDIR=%BUILD_PLATFORM%"
+echo "TARGET_PLATFORM: %TARGET_PLATFORM%"
 conda-build.exe "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
 if !errorlevel! neq 0 exit /b !errorlevel!
 set "_OLD_CONDA_SUBDIR="
