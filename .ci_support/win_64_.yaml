@@ -7,6 +7,6 @@ channel_sources:
 channel_targets:
 - conda-forge main
 libffi:
-- '3.5'
+- '3.7'
 target_platform:
 - win-64
