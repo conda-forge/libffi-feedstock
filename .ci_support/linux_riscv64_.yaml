@@ -1,3 +1,5 @@
+DOCKER_PLATFORM:
+- linux/amd64
 c_compiler:
 - gcc
 c_compiler_version:
@@ -13,6 +15,6 @@ channel_targets:
 docker_image:
 - quay.io/condaforge/linux-anvil-x86_64:alma10
 libffi:
-- '3.5'
+- '3.7'
 target_platform:
 - linux-riscv64
